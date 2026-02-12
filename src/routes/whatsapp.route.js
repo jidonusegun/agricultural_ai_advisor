@@ -41,28 +41,36 @@ router.post("/webhook", async (req, res) => {
 
   const from = message.from;
 
-  try {
-    if (message.type === "image") {
-      const imagePath = await whatsappService.downloadMedia(
-        message.image.id
-      );
+  if (message.type === "image") {
+    const imagePath = await whatsappService.downloadMedia(
+      message.image.id
+    );
 
-      const crop = "cassava";
-      const diagnosis = await visionService.analyzeCrop(imagePath, crop);
-      const marketAdvice = marketService.getMarketAdvice(crop, "Badagry");
+    // ⭐ USER QUESTION FROM WHATSAPP
+    const userQuestion =
+      message.image.caption || "Analyze this crop";
 
-      const advice = await aiService.generateAdvice({
-        crop,
-        diagnosis,
-        marketAdvice,
-        language: "pidgin",
-        location: "Badagry",
-      });
+    // detect crop automatically later if needed
+    const crop = "cassava";
 
-      await sendWhatsAppMessage(from, advice);
-    }
-  } catch (err) {
-    console.error("Webhook error:", err);
+    const diagnosis = await visionService.analyzeCrop(imagePath, crop);
+
+    const marketAdvice = marketService.getMarketAdvice(
+      crop,
+      "Badagry"
+    );
+
+    // ⭐ PASS USER QUESTION INTO AI
+    const advice = await aiService.generateAdvice({
+      crop,
+      diagnosis,
+      marketAdvice,
+      userQuestion,
+      location: "Badagry",
+      language: "pidgin",
+    });
+
+    await sendWhatsAppMessage(from, advice);
   }
 
   res.sendStatus(200);
