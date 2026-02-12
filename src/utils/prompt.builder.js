@@ -6,6 +6,7 @@ exports.buildPrompt = ({
   marketAdvice,
   language,
   location,
+  userQuestion,
 }) => {
   const fertilizer = fertilizerRules[crop?.toLowerCase()];
 

@@ -13,6 +13,5 @@ exports.generateAdvice = async (data) => {
     messages: [{ role: "user", content: prompt }],
     temperature: 0.4,
   });
-console.log("AI Response:", response.choices[0].message.content);
   return response.choices[0].message.content;
 };
