@@ -12,6 +12,10 @@ const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 ////////////////////////////////////////////////////
 // ✅ META WEBHOOK VERIFICATION (REQUIRED)
 ////////////////////////////////////////////////////
+router.get("/", (req, res) => {
+  res.send("Server is running");
+});
+
 router.get("/webhook", (req, res) => {
   const mode = req.query["hub.mode"];
   const token = req.query["hub.verify_token"];
