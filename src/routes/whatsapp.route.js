@@ -41,36 +41,43 @@ router.post("/webhook", async (req, res) => {
 
   const from = message.from;
 
-  if (message.type === "image") {
-    const imagePath = await whatsappService.downloadMedia(
-      message.image.id
-    );
+  try {
+    console.log("message", message);
+    if (message.type === "image") {
+      const imagePath = await whatsappService.downloadMedia(
+        message.image.id
+      );
 
-    // ⭐ USER QUESTION FROM WHATSAPP
-    const userQuestion =
-      message.image.caption || "Analyze this crop";
+      // ⭐ USER QUESTION FROM WHATSAPP
+      const userQuestion =
+        message.image.caption || "Analyze this crop";
 
-    // detect crop automatically later if needed
-    const crop = "cassava";
+      // detect crop automatically later if needed
+      const crop = "cassava";
 
-    const diagnosis = await visionService.analyzeCrop(imagePath, crop);
+      const diagnosis = await visionService.analyzeCrop(imagePath, crop);
 
-    const marketAdvice = marketService.getMarketAdvice(
-      crop,
-      "Badagry"
-    );
+      const marketAdvice = marketService.getMarketAdvice(
+        crop,
+        "Badagry"
+      );
 
-    // ⭐ PASS USER QUESTION INTO AI
-    const advice = await aiService.generateAdvice({
-      crop,
-      diagnosis,
-      marketAdvice,
-      userQuestion,
-      location: "Badagry",
-      language: "pidgin",
-    });
-    console.log({from, advice});
+      // ⭐ PASS USER QUESTION INTO AI
+      const advice = await aiService.generateAdvice({
+        crop,
+        diagnosis,
+        marketAdvice,
+        userQuestion,
+        location: "Badagry",
+        language: "pidgin",
+      });
+      console.log({from, advice});
 
+      await sendWhatsAppMessage(from, advice);
+    }
+
+  } catch (error) {
+    console.error("Error:", error);
     await sendWhatsAppMessage(from, advice);
   }
 
