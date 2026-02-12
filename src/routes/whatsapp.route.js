@@ -69,6 +69,7 @@ router.post("/webhook", async (req, res) => {
       location: "Badagry",
       language: "pidgin",
     });
+    console.log({from, advice});
 
     await sendWhatsAppMessage(from, advice);
   }
