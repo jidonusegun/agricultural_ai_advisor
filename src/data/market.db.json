@@ -1,0 +1,17 @@
+{
+    "cassava": {
+      "badagry": {
+        "price_per_ton": "₦80,000 – ₦150,000",
+        "buyers": [
+          "Garri processing factories",
+          "Local food markets",
+          "Industrial starch companies"
+        ],
+        "peak_demand": "Dry season",
+        "markets": [
+          "Badagry central market",
+          "Lagos Mile 12 market"
+        ]
+      }
+    }
+  }

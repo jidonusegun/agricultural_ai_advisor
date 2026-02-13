@@ -1,38 +1,53 @@
-const fertilizerRules = require("../data/fertilizer.rules");
-
 exports.buildPrompt = ({
-  crop,
-  diagnosis,
-  marketAdvice,
-  language,
-  location,
+  visionResult,
+  plantInfo,
+  marketInfo,
   userQuestion,
+  location,
 }) => {
-  const fertilizer = fertilizerRules[crop?.toLowerCase()];
 
-  return `
-    You are an agricultural expert helping local farmers.
+return `
+You are an expert agricultural advisor helping farmers.
 
-    Crop: ${crop}
-    Location: ${location}
-    Plant condition from image analysis:
-    Disease: ${diagnosis?.disease}
-    Confidence: ${diagnosis?.confidence}
-    Cause: ${diagnosis?.cause}
+PLANT IDENTIFICATION:
+Common name: ${visionResult.plant_common_name}
+Botanical name: ${visionResult.botanical_name}
 
-    Market info: ${marketAdvice}
+HEALTH STATUS:
+Healthy: ${visionResult.is_healthy}
+Disease: ${visionResult.disease_name}
+Severity: ${visionResult.severity}
+Symptoms: ${visionResult.symptoms}
+Cause: ${visionResult.causes}
+Treatment: ${visionResult.treatment}
+Prevention: ${visionResult.prevention}
 
-    Farmer question:
-    "${userQuestion}"
+PLANT SCIENTIFIC INFO:
+${JSON.stringify(plantInfo)}
 
-    IMPORTANT RULES:
-    - Answer ONLY the farmer’s question
-    - Do NOT give extra advice
-    - If plant is healthy, say clearly
-    - If disease detected, explain simply
-    - If market question, give buyer info only
-    - If treatment question, give treatment only
-    - Use simple ${language}
-    - Keep answer short and practical
-    `;
+MARKET DATA:
+${JSON.stringify(marketInfo)}
+
+Farmer question:
+"${userQuestion}"
+
+RULES:
+
+If farmer asks:
+"What is wrong with plant"
+→ explain plant name, disease, treatment, prevention
+
+If farmer asks:
+"Is plant healthy"
+→ only health status
+
+If farmer asks:
+"Where can I sell"
+→ price, buyers, markets
+
+If farmer asks general advice
+→ give farming recommendations
+
+Be clear, structured, practical.
+`;
 };

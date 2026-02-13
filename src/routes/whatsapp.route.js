@@ -1,5 +1,6 @@
 const whatsappService = require("../services/whatsapp.service");
 const visionService = require("../services/vision.service");
+const plantService = require("../services/plant.service");
 const aiService = require("../services/ai.service");
 const marketService = require("../services/market.service");
 const { sendWhatsAppMessage } = require("../services/whatsapp.send");
@@ -70,19 +71,21 @@ router.post("/webhook", async (req, res) => {
 
     const crop = "cassava";
 
-    const diagnosis =
-      await visionService.analyzeCrop(imagePath, crop);
+    const visionResult = await visionService.analyzeCrop(imagePath);
 
-    const marketAdvice =
-      marketService.getMarketAdvice(crop, "Badagry");
+    const plantInfo = plantService.getPlantInfo(visionResult.plant_common_name);
+
+    const marketInfo = marketService.getMarketAdvice(
+      visionResult.plant_common_name,
+      "Badagry"
+    );
 
     const advice = await aiService.generateAdvice({
-      crop,
-      diagnosis,
-      marketAdvice,
+      visionResult,
+      plantInfo,
+      marketInfo,
       userQuestion,
-      location: "Badagry",
-      language: "pidgin",
+      location: "Badagry"
     });
 
     await sendWhatsAppMessage(from, advice);

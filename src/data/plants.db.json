@@ -1,0 +1,19 @@
+{
+    "cassava": {
+      "botanical_name": "Manihot esculenta",
+      "family": "Euphorbiaceae",
+      "uses": "Food crop, garri, starch",
+      "growth_period": "8–12 months",
+      "ideal_climate": "Tropical warm climate",
+      "soil_type": "Well-drained sandy loam"
+    },
+  
+    "maize": {
+      "botanical_name": "Zea mays",
+      "family": "Poaceae",
+      "uses": "Food, livestock feed",
+      "growth_period": "90–120 days",
+      "ideal_climate": "Warm sunny climate",
+      "soil_type": "Fertile loamy soil"
+    }
+}  
