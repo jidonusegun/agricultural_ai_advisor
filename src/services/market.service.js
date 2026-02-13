@@ -1,10 +1,7 @@
-exports.getMarketAdvice = (crop, location) => {
-    const advice = {
-      cassava:
-        "Cassava sells well in Badagry and Mile 12 markets. Best sold 9–12 months after planting.",
-      maize:
-        "Maize prices rise during dry season. Store properly to sell later for better profit.",
-    };
-  
-    return advice[crop?.toLowerCase()] || "Check local markets for best prices.";
-  };
+const marketDB = require("../data/market.db.json");
+
+exports.getMarketAdvice = (plantName, location) => {
+  const plant = marketDB[plantName?.toLowerCase()];
+  const loc = plant?.[location?.toLowerCase()];
+  return loc || null;
+};
