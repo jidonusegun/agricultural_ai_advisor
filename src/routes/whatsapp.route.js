@@ -33,54 +33,66 @@ router.get("/webhook", (req, res) => {
 ////////////////////////////////////////////////////
 // ✅ INCOMING WHATSAPP MESSAGES
 ////////////////////////////////////////////////////
+const processedMessages = new Set();
+
 router.post("/webhook", async (req, res) => {
-  console.log("🔥 WEBHOOK RECEIVED:");
-  console.log(JSON.stringify(req.body, null, 2));
-  const message =
-    req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
 
-  if (!message) return res.sendStatus(200);
+  const value = req.body.entry?.[0]?.changes?.[0]?.value;
 
+  if (!value?.messages) {
+    return res.sendStatus(200);
+  }
+
+  const message = value.messages[0];
   const from = message.from;
+  const messageId = message.id;
+
+  if (processedMessages.has(messageId)) {
+    console.log("Duplicate message ignored");
+    return res.sendStatus(200);
+  }
+
+  processedMessages.add(messageId);
 
   try {
-    console.log("message", message);
-    if (message.type === "image") {
-      const imagePath = await whatsappService.downloadMedia(
-        message.image.id
-      );
 
-      // ⭐ USER QUESTION FROM WHATSAPP
-      const userQuestion =
-        message.image.caption || "Analyze this crop";
-
-      // detect crop automatically later if needed
-      const crop = "cassava";
-
-      const diagnosis = await visionService.analyzeCrop(imagePath, crop);
-
-      const marketAdvice = marketService.getMarketAdvice(
-        crop,
-        "Badagry"
-      );
-
-      // ⭐ PASS USER QUESTION INTO AI
-      const advice = await aiService.generateAdvice({
-        crop,
-        diagnosis,
-        marketAdvice,
-        userQuestion,
-        location: "Badagry",
-        language: "pidgin",
-      });
-      console.log({from, advice});
-
-      await sendWhatsAppMessage(from, advice);
+    if (message.type !== "image") {
+      return res.sendStatus(200);
     }
 
-  } catch (error) {
-    console.error("Error:", error);
+    console.log("Downloading image...");
+    const imagePath = await whatsappService.downloadMedia(
+      message.image.id
+    );
+
+    const userQuestion =
+      message.image?.caption || "Analyze this crop";
+
+    const crop = "cassava";
+
+    const diagnosis =
+      await visionService.analyzeCrop(imagePath, crop);
+
+    const marketAdvice =
+      marketService.getMarketAdvice(crop, "Badagry");
+
+    const advice = await aiService.generateAdvice({
+      crop,
+      diagnosis,
+      marketAdvice,
+      userQuestion,
+      location: "Badagry",
+      language: "pidgin",
+    });
+
     await sendWhatsAppMessage(from, advice);
+
+  } catch (error) {
+    console.error("Webhook error:", error);
+    await sendWhatsAppMessage(
+      from,
+      "Sorry, I couldn't process your image. Try again."
+    );
   }
 
   res.sendStatus(200);

@@ -15,7 +15,10 @@ exports.buildPrompt = ({
 
     Crop: ${crop}
     Location: ${location}
-    Plant condition from image: ${diagnosis}
+    Plant condition from image analysis:
+    Disease: ${diagnosis?.disease}
+    Confidence: ${diagnosis?.confidence}
+    Cause: ${diagnosis?.cause}
 
     Market info: ${marketAdvice}
 
